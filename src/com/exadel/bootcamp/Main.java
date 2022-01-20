@@ -7,20 +7,20 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         try {
-            System.out.println("Try to use this cash machine...");
+            System.out.println("Type commands to use this cash machine...");
             while (scanner.hasNextLine()){
                 String userInput = scanner.nextLine();
                 if (userInput.equals("put")) {
                     int banknote;
-                    int volume;
+                    int quantity;
 
                     System.out.println("Enter banknote size:");
                     banknote = scanner.nextInt();
-                    System.out.println("Enter volume:");
-                    volume = scanner.nextInt();
+                    System.out.println("Enter quantity:");
+                    quantity = scanner.nextInt();
 
-                    CashMachine.setBanknotes(banknote, volume);
-                    History.setHistory("put cash: " + banknote + " --- " + volume);
+                    CashSlots.setBanknotes(banknote, quantity);
+                    History.setHistory("put cash: " + banknote + " size - " + quantity + " quantity");
                     System.out.println("Money was successfully loaded");
                 }
 
@@ -29,7 +29,10 @@ public class Main {
 //                }
 
                 else if (userInput.equals("cache")) {
-                    CashMachine.getBanknotes().forEach((k, v) -> System.out.println(k + " --- " + v));
+                    System.out.println("Available cash:");
+                    CashSlots.getBanknotes().forEach((k, v) -> {
+                        System.out.println(k + " size - " + v + " quantity");
+                    });
                     History.setHistory("checkout cash");
                 }
 
