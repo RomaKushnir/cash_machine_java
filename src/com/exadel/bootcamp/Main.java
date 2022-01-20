@@ -5,21 +5,22 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        Scanner userInput = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         try {
             System.out.println("Try to use this cash machine...");
-            while (userInput.hasNextLine()){
-                System.out.println("new loop");
-                if (userInput.nextLine().equals("put")) {
+            while (scanner.hasNextLine()){
+                String userInput = scanner.nextLine();
+                if (userInput.equals("put")) {
                     int banknote;
                     int volume;
 
                     System.out.println("Enter banknote size:");
-                    banknote = userInput.nextInt();
+                    banknote = scanner.nextInt();
                     System.out.println("Enter volume:");
-                    volume = userInput.nextInt();
+                    volume = scanner.nextInt();
 
                     CashMachine.setBanknotes(banknote, volume);
+                    History.setHistory("put cash: " + banknote + " --- " + volume);
                     System.out.println("Money was successfully loaded");
                 }
 
@@ -27,16 +28,20 @@ public class Main {
 //
 //                }
 
-                else if (userInput.nextLine().equals("cache")) {
+                else if (userInput.equals("cache")) {
                     CashMachine.getBanknotes().forEach((k, v) -> System.out.println(k + " --- " + v));
+                    History.setHistory("checkout cash");
                 }
 
-//                else if(userInput.nextLine().equals("stat")) {
-//
-//                }
+                else if(userInput.equals("stat")) {
+                    for (Object element : History.getHistoryArr()) {
+                        System.out.println(element);
+                    }
+                    History.setHistory("checkout stats");
+                }
 
-                else if (userInput.nextLine().equals("quit")) {
-                    userInput.close();
+                else if (userInput.equals("quit")) {
+                    scanner.close();
                 }
             }
 
@@ -44,8 +49,8 @@ public class Main {
             System.out.println("Error ::"+e.getMessage());
             e.printStackTrace();
         } finally {
-            if (userInput != null)
-                userInput.close();
+            if (scanner != null)
+                scanner.close();
         }
     }
 }
