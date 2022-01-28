@@ -9,6 +9,6 @@ public class Main {
         ClientAccount testUser2 = new ClientAccount("Petro");
         Users.createUser("ivan", testUser1);
         Users.createUser("petro", testUser2);
-        CommandExecutor.identifyUser();
+        CommandExecutor.runEntryPoint();
     }
 }
