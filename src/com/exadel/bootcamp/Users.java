@@ -16,11 +16,7 @@ public class Users {
 
     public static void showUsers() {
         users.forEach((k, v) -> {
-            System.out.println(k + " has available cash: " + v.showUserCash());
+            System.out.println(k + " has available cash: " + v.getAvailableCash());
         });
-
-//        for(Object entry: users.entrySet()) {
-//            System.out.println("user " + entry);
-//        }
     }
 }

@@ -3,7 +3,7 @@ package com.exadel.bootcamp;
 import java.util.Scanner;
 
 public class CommandExecutor {
-    public static void identifyUser() {
+    public static void runEntryPoint() {
         System.out.println("Welcome, enter you name");
         Scanner scanner = new Scanner(System.in);
         try {
@@ -11,72 +11,34 @@ public class CommandExecutor {
                 String command = scanner.nextLine();
                 if (command.equals("quit")) {
                     scanner.close();
+                    return;
                 }
                 else if (command.equals("admin")) {
-                    runAdmin();
+                    runAdmin(scanner);
                 } else {
-                    runClient();
+                    runClient(scanner, command);
                 }
-
-                System.out.println("command set: " + command);
             }
         } catch(Exception e){
             System.out.println("Error ::"+e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (scanner != null)
-                scanner.close();
         }
     }
-
-//    public static void identifyUser() {
-//        System.out.println("Enter you name");
-//        Scanner scanner = new Scanner(System.in);
-//        String inputValue = scanner.nextLine();
-//        System.out.println("value from console: " + inputValue);
-//
-//        if (inputValue.equals("admin")) {
-//            AdminUser admin = new AdminUser();
-//            System.out.println("Give a name to cash machine");
-//            Scanner adminScanner = new Scanner(System.in);
-//            String adminCommand = adminScanner.nextLine();
-//
-//            CashMachine c = new CashMachine("c1");
-//
-//            if (inputValue.equals("put")) {
-//                int banknote;
-//                int quantity;
-//
-//                System.out.println("Enter banknote size:");
-//                banknote = Integer.parseInt(inputValue);
-//                System.out.println("Enter quantity:");
-//                quantity = Integer.parseInt(inputValue);
-//
-//                admin.put(c, banknote, quantity);
-//                History.setHistory("put cash: " + banknote + " size - " + quantity + " quantity");
-//                System.out.println("Money was successfully loaded");
-//            } else if (inputValue.equals("home")) {
-//                identifyUser();
-//            }
-//        }
-//
-//        if (!Users.getUsers().keySet().contains(inputValue)) {
-//            Users.createUser(inputValue, new ClientAccount(inputValue));
-//        }
-//    }
-
-    public static void runAdmin() {
+    private static void runAdmin(Scanner scanner) {
         AdminUser admin = new AdminUser();
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("What are you going to do...");
+        System.out.println("What are you going to do..?");
         try {
             while (scanner.hasNextLine()) {
                 String command = scanner.nextLine();
-                if (command.equals("exit")) {
-                    identifyUser();
+                if (command.equals("home")) {
+                    runEntryPoint();
                 } else if (command.equals("put")) {
                     System.out.println("Give a name to cash machine");
-                    CashMachine c = new CashMachine(scanner.nextLine());
+                    String cashMachineName = scanner.nextLine();
+                    CashMachine c = CashMachines.getCashMachine(cashMachineName);
+                    if (c == null) {
+                        c = new CashMachine(cashMachineName);
+                    }
                     System.out.println("Enter banknote size:");
                     int banknote = scanner.nextInt();
                     System.out.println("Enter quantity:");
@@ -87,11 +49,14 @@ public class CommandExecutor {
                     System.out.println("Money was successfully loaded");
                     System.out.println("Choose next what to do");
                 } else if (command.equals("cache")) {
-                    //                System.out.println("Available cash:");
-                    //                CashMachine.getBanknotes().forEach((k, v) -> {
-                    //                    System.out.println(k + " size - " + v + " quantity");
-                    //                });
-                    //                History.setHistory("checkout cash");
+                    System.out.println("Name cash machine you want to check cash amount");
+                    CashMachine currentCashMachine = CashMachines.getCashMachine(scanner.nextLine());
+                    currentCashMachine.setBanknotes(10, 1000);
+                    System.out.println("Available cash:");
+                    currentCashMachine.getBanknotes().forEach((k, v) -> {
+                        System.out.println(k + " size - " + v + " quantity");
+                    });
+                    History.setHistory("checkout cash");
                 } else if (command.equals("stat")) {
                     for (Object element : CashMachines.getCashMachinesList()) {
                         System.out.println("CashMachines: "+ element);
@@ -102,66 +67,83 @@ public class CommandExecutor {
                     History.setHistory("checkout stats");
                 } else if (command.equals("users")) {
                     Users.showUsers();
+                    History.setHistory("checkout users list");
+                } else if (command.equals("cash")) {
+                    System.out.println("What name of cash machine?");
+                    CashMachines.getCashMachine(scanner.nextLine()).getAllBanknotesSum();
                 }
             }
          } catch(Exception e){
             System.out.println("Error ::"+e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (scanner != null)
-                scanner.close();
         }
     }
 
-    public static void runClient() {
-        Scanner scanner = new Scanner(System.in);
+    private static void runClient(Scanner scanner, String user) {
+        if (!Users.getUsers().containsKey(user)) {
+            Users.createUser(user, new ClientAccount(user));
+        }
+        ClientAccount userAccount = Users.getUsers().get(user);
+
         try {
-            System.out.println("Welcome...");
+            System.out.println("Welcome... type command...");
             while (scanner.hasNextLine()){
                 String userInput = scanner.nextLine();
-                if (userInput.equals("put")) {
-//                    int banknote;
-//                    int quantity;
-//
-//                    System.out.println("Enter banknote size:");
-//                    banknote = scanner.nextInt();
-//                    System.out.println("Enter quantity:");
-//                    quantity = scanner.nextInt();
-//
-//                    CashMachine.setBanknotes(banknote, quantity);
-//                    History.setHistory("put cash: " + banknote + " size - " + quantity + " quantity");
-//                    System.out.println("Money was successfully loaded");
+                if (userInput.equals("home")) {
+                    runEntryPoint();
+                } else if (userInput.equals("put")) {
+                    System.out.println("Enter cash amount you want to put");
+                    int cash = scanner.nextInt();
+                    userAccount.setAvailableCashAdd(cash);
+                    System.out.println("Money was successfully loaded");
+                    System.out.println("What are you going to do next?");
                 }
 
-//                else if (userInput.equals("give")) {
-//                    for (Object entry: CashMachine.getBanknotes().entrySet()) {
-//                        System.out.println(entry);
-//                    }
-//                }
+                else if (userInput.equals("give")) {
+                    System.out.println("Enter cash machine name...");
+                    CashMachine currentCashMachine = CashMachines.getCashMachine(scanner.nextLine());
+                    System.out.println("What sum do you want to withdraw?");
+                    int userWithdrawSum = scanner.nextInt();
+                    //use for testing
+//                    currentCashMachine.giveClientCash(userWithdrawSum);
+                    if (userAccount.getAvailableCash() < userWithdrawSum) {
+                        System.out.println("You have no such amount on your account");
+                    }
+                    if (currentCashMachine.getAllBanknotesSum() < userWithdrawSum) {
+                        System.out.println("There are no such sum available to give");
+                        int safeWithdraw = currentCashMachine.getAllBanknotesSum()/2;
+                        System.out.println("Do you want to withdraw " + safeWithdraw + " Y/N?");
+                        Scanner scanner1 = new Scanner(System.in);
+                        if (scanner1.nextLine().equals("Y")) {
+                            currentCashMachine.giveClientCash(safeWithdraw);
+                            userAccount.setAvailableCashRemove(safeWithdraw);
+                            System.out.println("Money are successfully withdrawn");
+                        } else {
+                            runEntryPoint();
+                        }
 
-//                else if (userInput.equals("cache")) {
-//                    System.out.println("Available cash:");
-//                    CashMachine.getBanknotes().forEach((k, v) -> {
-//                        System.out.println(k + " size - " + v + " quantity");
-//                    });
-//                    System.out.println();
-//                    History.setHistory("checkout cash");
-//                }
+                    } else {
+                        currentCashMachine.giveClientCash(userWithdrawSum);
+                        userAccount.setAvailableCashRemove(userWithdrawSum);
+                        System.out.println("Money are successfully withdrawn");
+                        runEntryPoint();
+                    }
+                }
 
-//        if (!Users.getUsers().keySet().contains(inputValue)) {
-//            Users.createUser(inputValue, new ClientAccount(inputValue));
-//        }
+                else if (userInput.equals("cache")) {
+                    System.out.println("available cash is: " + userAccount.getAvailableCash());
+                }
+
+
                 else if (userInput.equals("quit")) {
                     scanner.close();
+                    return;
                 }
             }
 
         }catch(Exception e){
             System.out.println("Error ::"+e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (scanner != null)
-                scanner.close();
         }
     }
 }

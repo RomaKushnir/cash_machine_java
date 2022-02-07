@@ -8,11 +8,19 @@ public class ClientAccount {
         this.name = name;
     }
 
-    public void put(CashMachine c, int cash) {
-        System.out.println("cash machine " + c + "user cash " + cash);
+    public void setAvailableCashAdd(int cash) {
+        this.availableCash += cash;
     }
 
-    public int showUserCash() {
+    public void setAvailableCashRemove(int cash) {
+        this.availableCash -= cash;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getAvailableCash() {
         return availableCash;
     }
 }
